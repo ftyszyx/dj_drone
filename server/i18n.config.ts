@@ -1,5 +1,5 @@
-import en from "./locales/en.json";
-import zh from "./locales/zh.json";
+import en from "./locales/en";
+import zh from "./locales/zh";
 
 export default defineI18nConfig(() => ({
   legacy: false, // 是否兼容之前

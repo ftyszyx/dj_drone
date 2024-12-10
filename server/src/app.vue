@@ -1,12 +1,23 @@
 <template>
   <div>
-    <h1 class="text-3xl font-bold underline">{{ $t("hello") }}</h1>
-    <p>{{ $t("message.welcome") }}</p>
-    <select v-model="locale">
-      <option v-for="locale in locales" :key="locale.code" :value="locale.code">{{ locale.name }}</option>
-    </select>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
-<script setup lang="ts">
-const { locale, locales } = useI18n();
+
+<script setup>
+const route = useRoute();
+
+// 监听路由变化
+watch(
+  () => route.path,
+  (path) => {
+    // 如果是根路径，重定向到登录页
+    if (path === "/") {
+      navigateTo("/login");
+    }
+  },
+  { immediate: true }
+);
 </script>
