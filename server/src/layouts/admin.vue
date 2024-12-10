@@ -25,7 +25,7 @@
               {{ locale.name }}
             </option>
           </select>
-          <button class="text-gray-600 hover:text-gray-800">
+          <button @click="handleLogout" class="text-gray-600 hover:text-gray-800">
             {{ $t("common.logout") }}
           </button>
         </div>
@@ -52,4 +52,13 @@ const route = useRoute();
 const currentPage = computed(() => {
   return menuItems.find((item) => item.path === route.path)?.title || "";
 });
+
+const handleLogout = async () => {
+  try {
+    await $fetch("/api/auth/logout", { method: "POST" });
+    await navigateTo("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
 </script>

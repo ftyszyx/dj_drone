@@ -98,11 +98,23 @@ const handleLogin = async () => {
     loading.value = true;
     error.value = false;
 
-    // 这里添加实际的登录逻辑
-    const token = "dummy_token"; // 实际应该从API获取
-    const authToken = useCookie("auth_token");
-    authToken.value = token;
-    await navigateTo("/admin/dashboard");
+    const response = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: {
+        username: form.username,
+        password: form.password,
+      },
+    });
+
+    if (response.success) {
+      // 如果选择了记住我，设置更长的 cookie 过期时间
+      if (form.remember) {
+        const authToken = useCookie("auth_token", {
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        });
+      }
+      await navigateTo("/admin/dashboard");
+    }
   } catch (err) {
     error.value = true;
     console.error("Login failed:", err);
