@@ -1,4 +1,4 @@
-import { verifyToken } from "../server/utils/jwt";
+import { verifyToken } from "~~/server/utils/jwt";
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const token = useCookie("auth_token");
