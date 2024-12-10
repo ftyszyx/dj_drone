@@ -1,0 +1,11 @@
+{
+  "vueFiles": "./src/**/*.?(js|vue)",
+  "languageFiles": "./locales/**/*.?(json|yaml|yml|js)",
+  "exclude": [],
+  "output": false,
+  "add": true,
+  "remove": true,
+  "ci": false,
+  "separator": ".",
+  "noEmptyTranslation": ""
+}

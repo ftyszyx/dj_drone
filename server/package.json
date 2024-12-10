@@ -7,11 +7,17 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "node tools/test.ts",
+    "i18n:extract": "vue-i18n-extract"
   },
   "dependencies": {
     "nuxt": "^3.14.1592",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@nuxtjs/i18n": "^9.0.0-rc.2",
+    "vue-i18n-extract": "file:packages/vue-il8n-extract"
   }
 }
