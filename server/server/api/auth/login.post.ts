@@ -1,62 +1,46 @@
-import db from "~~/server/utils/db";
-import bcrypt from "bcryptjs";
-import { generateToken } from "~~/server/utils/jwt";
+import { H3Event } from "h3";
+import { UserLoginDto } from "@common/types/user";
+import { userModel } from "~/server/models/UserModel";
+import { generateToken } from "~/server/utils/jwt";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event: H3Event) => {
   try {
-    const { username, password } = await readBody(event);
+    const body = await readBody<UserLoginDto>(event);
 
-    // 参数验证
-    if (!username || !password) {
-      return createError({
+    if (!body.username || !body.password) {
+      throw createError({
         statusCode: 400,
-        message: "Username and password are required",
+        message: "用户名和密码不能为空",
       });
     }
 
-    // 查询用户
-    const user = db.prepare("SELECT * FROM users WHERE username = ?").get(username);
-
-    // 用户不存在
+    const user = userModel.findByUsername(body.username);
     if (!user) {
-      return createError({
+      throw createError({
         statusCode: 401,
-        message: "Invalid username or password",
+        message: "用户名或密码错误",
       });
     }
 
-    // 验证密码
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return createError({
+    const validPassword = await userModel.verifyPassword(user, body.password);
+    if (!validPassword) {
+      throw createError({
         statusCode: 401,
-        message: "Invalid username or password",
+        message: "用户名或密码错误",
       });
     }
 
-    // 生成 token
-    const token = generateToken(user.id);
-
-    // 设置 cookie
-    setCookie(event, "auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    const token = generateToken({ id: user.id, username: user.username });
 
     return {
-      success: true,
       user: {
         id: user.id,
         username: user.username,
+        created_at: user.created_at,
       },
+      token,
     };
   } catch (error) {
-    console.error("Login error:", error);
-    return createError({
-      statusCode: 500,
-      message: "Internal server error",
-    });
+    throw error;
   }
 });

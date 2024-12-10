@@ -1,15 +1,24 @@
 import jwt from "jsonwebtoken";
+import { createError } from "h3";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-export function generateToken(userId: number): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
+interface TokenPayload {
+  id: number;
+  username: string;
 }
 
-export function verifyToken(token: string): any {
+export function generateToken(payload: TokenPayload): string {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+}
+
+export function verifyToken(token: string): TokenPayload {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch (error) {
-    return null;
+    throw createError({
+      statusCode: 401,
+      message: "无效的token",
+    });
   }
 }
