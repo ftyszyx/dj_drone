@@ -5,8 +5,8 @@ export class UserModel extends BaseModel<User> {
     super(new User());
   }
 
-  initTable() {
-    SqliteHelper.initOneDb(this.entity, this.Name);
+  override initTable() {
+    SqliteHelper.initOneDb(this.entity);
     this.createDefaultAdmin();
   }
 

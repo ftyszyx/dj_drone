@@ -1,5 +1,5 @@
 export class BaseEntity {
-  [key: symbol]: any;
+  [key: string]: any;
   @Column({ type: "INTEGER", primary: true, unique: true })
   id: number = 0;
 }

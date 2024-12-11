@@ -1,13 +1,14 @@
 import "reflect-metadata";
 
-export const ENTITY_METADATA_KEY = Symbol("entity");
-export const COLUMN_METADATA_KEY = Symbol("column");
-export const Table_Name_KEY = Symbol("name");
+export const COLUMN_METADATA_KEY = "column";
+export const TABLE_NAME_KEY = "entityName";
+export const COLUMN_NAME_KEY = "col_name";
+export const COLUMN_TYPE_KEY = "col_type";
 
 // 实体装饰器
 export function Entity(tableName: string) {
   return function (target: Function) {
-    Reflect.defineMetadata(ENTITY_METADATA_KEY, tableName, target);
+    target.prototype[TABLE_NAME_KEY] = tableName;
   };
 }
 
@@ -18,8 +19,8 @@ export function Column(options: ColumnOptions): PropertyDecorator {
     if (!options) options = {} as ColumnOptions;
     const col_name = options.name || propertyName.toString();
     const col_type = options.type || "VARCHAR";
-    // const existingColumns = Reflect.getMetadata(COLUMN_METADATA_KEY, instance.constructor) || {};
-    // const obj = instance.constructor;
+    Reflect.defineMetadata(COLUMN_NAME_KEY, col_name, instance, col_name);
+    Reflect.defineMetadata(COLUMN_TYPE_KEY, col_type, instance, col_type);
     console.log("instance", instance);
     console.log("propertyName", propertyName);
     for (const key in options) {
@@ -39,5 +40,7 @@ interface ColumnOptions {
   primary?: boolean;
   unique?: boolean;
   nullable?: boolean;
+  unique_index?: boolean;
+  index?: string;
   default?: any;
 }

@@ -2,7 +2,7 @@ import "reflect-metadata";
 export class BaseModel<Entity extends BaseEntity> {
   private entity_name: EntityType;
   constructor(public entity: Entity) {
-    this.entity_name = entity[Table_Name_KEY] as EntityType;
+    this.entity_name = entity[TABLE_NAME_KEY] as EntityType;
   }
   public get Name() {
     return this.entity_name;
@@ -21,5 +21,7 @@ export class BaseModel<Entity extends BaseEntity> {
     }
   }
 
-  initTable() {}
+  initTable() {
+    throw new Error("Not implemented");
+  }
 }
