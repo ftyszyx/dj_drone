@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rimraf .nuxt && nuxt build",
+    "build": "rimraf .nuxt && rimraf .output && nuxt build",
     "dev": "rimraf .nuxt&&rimraf .output && nuxt dev",
+    "dev1": "node .nuxt/dev/index.mjs",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -16,6 +17,7 @@
     "better-sqlite3": "^11.7.0",
     "jsonwebtoken": "^9.0.2",
     "nuxt": "^3.14.1592",
+    "reflect-metadata": "^0.2.2",
     "vue": "latest",
     "vue-router": "latest"
   },

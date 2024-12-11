@@ -1,45 +1,41 @@
-import { User } from "~~/common/types/user";
-import bcrypt from "bcryptjs";
 import { BaseModel } from "../utils/BaseModel";
+import bcrypt from "bcryptjs";
+import { User } from "../../common/types/user";
+import Database from "better-sqlite3";
 
 export class UserModel extends BaseModel {
-  constructor() {
-    super("users");
+  protected static entity = User;
+
+  // 初始化
+  static async init(db: Database.Database) {
+    super.init(db);
+    await this.createDefaultAdmin();
   }
 
-  /**
-   * 创建用户
-   */
-  async createUser(username: string, password: string): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const result = this.create({
-      username,
-      password: hashedPassword,
-    });
-    return this.findOne({ id: result.lastInsertRowid }) as User;
+  // 创建默认管理员账户
+  private static createDefaultAdmin() {
+    const admin = this.findByUsername("admin");
+    if (!admin) {
+      const hashedPassword = bcrypt.hashSync("admin123", 10);
+      this.db.prepare("INSERT INTO users (username, password) VALUES (?, ?)").run("admin", hashedPassword);
+    }
   }
 
-  /**
-   * 通过用户名查找用户
-   */
-  findByUsername(username: string): User | undefined {
-    return this.findOne({ username }) as User | undefined;
+  // 根据用户名查找用户
+  static findByUsername(username: string): User | undefined {
+    return this.db.prepare("SELECT * FROM users WHERE username = ?").get(username) as User | undefined;
   }
 
-  /**
-   * 验证用户密码
-   */
-  async verifyPassword(user: User, password: string): Promise<boolean> {
-    return bcrypt.compare(password, user.password);
+  // 创建用户
+  static create(username: string, password: string): User {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const result = this.db.prepare("INSERT INTO users (username, password) VALUES (?, ?)").run(username, hashedPassword);
+
+    return this.db.prepare("SELECT * FROM users WHERE id = ?").get(result.lastInsertRowid) as User;
   }
 
-  /**
-   * 更新用户信息
-   */
-  updateUser(id: number, data: Partial<User>) {
-    return this.update({ id }, data);
+  // 验证密码
+  static verifyPassword(password: string, hashedPassword: string): boolean {
+    return bcrypt.compareSync(password, hashedPassword);
   }
 }
-
-// 导出单例
-export const userModel = new UserModel();

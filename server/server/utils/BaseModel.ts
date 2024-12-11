@@ -1,88 +1,54 @@
-import db from "./db";
-import { Database } from "better-sqlite3";
+import "reflect-metadata";
+import Database from "better-sqlite3";
+import { ENTITY_METADATA_KEY, COLUMN_METADATA_KEY } from "../decorators/Entity";
 
 export class BaseModel {
-  protected tableName: string;
-  protected db: Database;
+  protected static db: Database.Database;
+  protected static entity: any;
 
-  constructor(tableName: string) {
-    this.tableName = tableName;
-    this.db = db;
-  }
-
-  /**
-   * 查找单条记录
-   */
-  findOne(where: Record<string, any>) {
-    const keys = Object.keys(where);
-    const whereClause = keys.map((key) => `${key} = ?`).join(" AND ");
-    const values = Object.values(where);
-
-    const sql = `SELECT * FROM ${this.tableName} WHERE ${whereClause}`;
-    return this.db.prepare(sql).get(...values);
-  }
-
-  /**
-   * 查找多条记录
-   */
-  find(where: Record<string, any> = {}) {
-    if (Object.keys(where).length === 0) {
-      return this.db.prepare(`SELECT * FROM ${this.tableName}`).all();
+  static init(db: Database.Database) {
+    try {
+      this.db = db;
+      this.initTable();
+    } catch (error) {
+      console.error(`Failed to initialize ${this.constructor.name}:`, error);
+      throw error;
     }
-
-    const keys = Object.keys(where);
-    const whereClause = keys.map((key) => `${key} = ?`).join(" AND ");
-    const values = Object.values(where);
-
-    const sql = `SELECT * FROM ${this.tableName} WHERE ${whereClause}`;
-    return this.db.prepare(sql).all(...values);
   }
 
-  /**
-   * 插入记录
-   */
-  create(data: Record<string, any>) {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
-    const placeholders = keys.map(() => "?").join(", ");
-
-    const sql = `INSERT INTO ${this.tableName} (${keys.join(", ")}) VALUES (${placeholders})`;
-    const result = this.db.prepare(sql).run(...values);
-    return result;
+  protected static getTableName(): string {
+    return Reflect.getMetadata(ENTITY_METADATA_KEY, this.entity);
   }
 
-  /**
-   * 更新记录
-   */
-  update(where: Record<string, any>, data: Record<string, any>) {
-    const updateKeys = Object.keys(data);
-    const updateValues = Object.values(data);
-    const updateClause = updateKeys.map((key) => `${key} = ?`).join(", ");
-
-    const whereKeys = Object.keys(where);
-    const whereValues = Object.values(where);
-    const whereClause = whereKeys.map((key) => `${key} = ?`).join(" AND ");
-
-    const sql = `UPDATE ${this.tableName} SET ${updateClause} WHERE ${whereClause}`;
-    return this.db.prepare(sql).run(...updateValues, ...whereValues);
+  protected static getColumns(): Record<string, any> {
+    return Reflect.getMetadata(COLUMN_METADATA_KEY, this.entity) || {};
   }
 
-  /**
-   * 删除记录
-   */
-  delete(where: Record<string, any>) {
-    const keys = Object.keys(where);
-    const values = Object.values(where);
-    const whereClause = keys.map((key) => `${key} = ?`).join(" AND ");
+  protected static generateCreateTableSQL(): string {
+    const tableName = this.getTableName();
+    const columns = this.getColumns();
 
-    const sql = `DELETE FROM ${this.tableName} WHERE ${whereClause}`;
-    return this.db.prepare(sql).run(...values);
+    const columnDefinitions = Object.entries(columns)
+      .map(([name, config]) => {
+        const { type, primary, unique, nullable, default: defaultValue } = config;
+        let definition = `${name} ${type}`;
+
+        if (primary) definition += " PRIMARY KEY";
+        if (unique) definition += " UNIQUE";
+        if (!nullable) definition += " NOT NULL";
+        if (defaultValue !== undefined) {
+          definition += ` DEFAULT ${defaultValue}`;
+        }
+
+        return definition;
+      })
+      .join(", ");
+
+    return `CREATE TABLE IF NOT EXISTS ${tableName} (${columnDefinitions})`;
   }
 
-  /**
-   * 自定义查询
-   */
-  query(sql: string, params: any[] = []) {
-    return this.db.prepare(sql).all(...params);
+  protected static initTable() {
+    const sql = this.generateCreateTableSQL();
+    this.db.exec(sql);
   }
 }

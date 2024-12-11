@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
-  srcDir: "src",
+  srcDir: "client",
   serverDir: "server",
   devtools: { enabled: true },
   modules: ["@nuxtjs/i18n"],
@@ -19,5 +19,26 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: "zh",
+  },
+  typescript: {
+    tsConfig: {
+      compilerOptions: {
+        paths: {
+          "@common/*": ["../common/*"],
+          "@server/*": ["../server/*"],
+          "@types/*": ["../common/types/*"],
+        },
+      },
+    },
+  },
+  nitro: {
+    // moduleSideEffects: ["reflect-metadata"],
+    logLevel: process.env.NODE_ENV === "development" ? 3 : 1,
+    externals: {
+      external: ["jsonwebtoken"],
+    },
+  },
+  experimental: {
+    asyncContext: true,
   },
 });

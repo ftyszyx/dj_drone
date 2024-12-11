@@ -1,24 +1,24 @@
 import jwt from "jsonwebtoken";
-import { createError } from "h3";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
-interface TokenPayload {
-  id: number;
-  username: string;
+// 确保只在服务器端运行
+if (process.client) {
+  throw new Error("JWT utilities can only be used on server side");
 }
 
-export function generateToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+export interface TokenPayload {
+  userId: number;
 }
 
-export function verifyToken(token: string): TokenPayload {
+export function generateToken(userId: number): string {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "7d" });
+}
+
+export function verifyToken(token: string): TokenPayload | null {
   try {
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch (error) {
-    throw createError({
-      statusCode: 401,
-      message: "无效的token",
-    });
+    return null;
   }
 }
