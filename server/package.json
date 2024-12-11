@@ -9,7 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "i18n:extract": "vue-i18n-extract",
+    "lang": "vue-i18n-extract",
     "tailwind": "tailwindcss -i ./src/assets/css/tailwind.css -o ./src/assets/css/tailwind_output.css --watch"
   },
   "dependencies": {

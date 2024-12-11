@@ -26,19 +26,11 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "zh",
   },
-  vite: {
-    esbuild: {
-      tsconfigRaw: {
-        compilerOptions: {
-          experimentalDecorators: true,
-        },
-      },
-    },
-  },
   typescript: {
     tsConfig: {
       compilerOptions: {
         // 启用实验性装饰器
+        target: "esnext",
         experimentalDecorators: true,
         strictNullChecks: false,
         emitDecoratorMetadata: true,
@@ -54,9 +46,20 @@ export default defineNuxtConfig({
     imports: {
       dirs: ["common/**"],
     },
+    esbuild: {
+      options: {
+        tsconfigRaw: {
+          compilerOptions: {
+            target: "esnext",
+            experimentalDecorators: true,
+          },
+        },
+      },
+    },
     typescript: {
       tsConfig: {
         compilerOptions: {
+          target: "esnext",
           experimentalDecorators: true,
           strictNullChecks: false,
           emitDecoratorMetadata: true,

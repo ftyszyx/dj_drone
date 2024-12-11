@@ -43,10 +43,12 @@ class SqliteHelperClass {
     let table_desc = `CREATE TABLE IF NOT EXISTS ${tableName} (\n`;
     let index_desc = "";
     const keys = Reflect.ownKeys(obj);
+    Logger.info(`Table ${tableName} keys:`, keys);
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      const col_type = Reflect.getMetadata(COLUMN_TYPE_KEY, obj, key);
       const col_name = Reflect.getMetadata(COLUMN_NAME_KEY, obj, key);
+      const col_type = Reflect.getMetadata(COLUMN_TYPE_KEY, obj, key);
+      console.log("col_name", col_name, col_type);
       const isprimary = Reflect.getMetadata("primary", obj, key);
       if (!col_type) continue;
       table_desc += `${col_name} ${col_type}`;

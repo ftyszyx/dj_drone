@@ -19,10 +19,9 @@ export function Column(options: ColumnOptions): PropertyDecorator {
     if (!options) options = {} as ColumnOptions;
     const col_name = options.name || propertyName.toString();
     const col_type = options.type || "VARCHAR";
-    Reflect.defineMetadata(COLUMN_NAME_KEY, col_name, instance, col_name);
-    Reflect.defineMetadata(COLUMN_TYPE_KEY, col_type, instance, col_type);
-    console.log("instance", instance);
-    console.log("propertyName", propertyName);
+    // console.log("instance", instance, "col_name", col_name, "col_type", col_type, "propertyName", propertyName);
+    Reflect.defineMetadata(COLUMN_NAME_KEY, col_name, instance, propertyName);
+    Reflect.defineMetadata(COLUMN_TYPE_KEY, col_type, instance, propertyName);
     for (const key in options) {
       try {
         Reflect.defineMetadata(key, options[key], instance, propertyName);
