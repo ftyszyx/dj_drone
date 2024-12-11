@@ -1,7 +1,7 @@
 import { UserModel } from "../../models/UserModel";
 import { generateToken } from "../../utils/jwt";
 import { H3Event } from "h3";
-import { UserLoginDto, UserResponseDto } from "../../../common/types/user";
+import { UserLoginDto, UserResponseDto } from "../../../common/types/user.entity";
 import { Logger } from "../../utils/logger";
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // 参数验证
     if (!username || !password) {
-      await Logger.warn("Login attempt with missing credentials");
+      Logger.warn("Login attempt with missing credentials");
       return createError({
         statusCode: 400,
         message: "Username and password are required",
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // 用户不存在
     if (!user) {
-      await Logger.warn(`Login attempt with non-existent username: ${username}`);
+      Logger.warn(`Login attempt with non-existent username: ${username}`);
       return createError({
         statusCode: 401,
         message: "Invalid username or password",
@@ -32,14 +32,14 @@ export default defineEventHandler(async (event: H3Event) => {
     // 验证密码
     const isValidPassword = UserModel.verifyPassword(password, user.password);
     if (!isValidPassword) {
-      await Logger.warn(`Failed login attempt for user: ${username}`);
+      Logger.warn(`Failed login attempt for user: ${username}`);
       return createError({
         statusCode: 401,
         message: "Invalid username or password",
       });
     }
 
-    await Logger.info(`User logged in successfully: ${username}`);
+    Logger.info(`User logged in successfully: ${username}`);
 
     // 生成 token
     const token = generateToken(user.id);
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event: H3Event) => {
       user: userResponse,
     };
   } catch (error) {
-    await Logger.error("Login error:", error);
+    Logger.error("Login error:", error);
     return createError({
       statusCode: 500,
       message: "Internal server error",
