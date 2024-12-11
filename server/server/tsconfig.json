@@ -1,9 +1,3 @@
 {
-  "extends": "../.nuxt/tsconfig.server.json",
-  "compilerOptions": {
-    "paths": {
-      "@types/*": ["../common/types/*"],
-      "@common/*": ["../common/*"]
-    }
-  }
+  "extends": "../.nuxt/tsconfig.server.json"
 }

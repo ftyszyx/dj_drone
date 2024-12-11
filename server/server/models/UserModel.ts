@@ -1,4 +1,4 @@
-import { User } from "@common/types/user";
+import { User } from "~~/common/types/user";
 import bcrypt from "bcryptjs";
 import { BaseModel } from "../utils/BaseModel";
 

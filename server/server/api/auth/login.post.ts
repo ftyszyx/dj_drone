@@ -1,7 +1,7 @@
 import { H3Event } from "h3";
-import { UserLoginDto } from "@common/types/user";
-import { userModel } from "~/server/models/UserModel";
-import { generateToken } from "~/server/utils/jwt";
+import { UserLoginDto } from "~~/common/types/user";
+import { userModel } from "~~/server/models/UserModel";
+import { generateToken } from "~~/server/utils/jwt";
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
