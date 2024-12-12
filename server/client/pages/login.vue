@@ -87,7 +87,6 @@
 const form = reactive({
   username: "",
   password: "",
-  remember: false,
 });
 
 const loading = ref(false);
@@ -104,14 +103,15 @@ const handleLogin = async () => {
         username: form.username,
         password: form.password,
       },
-    });
+    }) as ApiResp<UserLoginRes>;
 
     if (response.success) {
       // 如果选择了记住我，设置更长的 cookie 过期时间
+      const authToken = useCookie("auth_token", {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
       if (form.remember) {
-        const authToken = useCookie("auth_token", {
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-        });
+        authToken.value = response.data.token;
       }
       await navigateTo("/admin/dashboard");
     }

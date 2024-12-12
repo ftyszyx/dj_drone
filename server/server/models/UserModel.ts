@@ -14,26 +14,35 @@ export class UserModel extends BaseModel<User> {
   private createDefaultAdmin() {
     const admin = this.findByUsername("admin");
     if (!admin) {
-      const hashedPassword = bcrypt.hashSync("admin123", 10);
-      SqliteHelper.db.prepare("INSERT INTO users (username, password) VALUES (?, ?)").run("admin", hashedPassword);
+      const hashedPassword = bcrypt.hashSync(process.env.ADMIN_INIT_PASSWORD, 10);
+      this.AddOne({ username: "admin", password: hashedPassword });
     }
   }
 
   // 根据用户名查找用户
   findByUsername(username: string): User | undefined {
-    return SqliteHelper.db.prepare("SELECT * FROM users WHERE username = ?").get(username) as User | undefined;
+    return this.GetOne({ cond: { username } });
   }
 
   // 创建用户
-  create(username: string, password: string): User {
+  create(username: string, password: string): User | null {
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const result = SqliteHelper.db.prepare("INSERT INTO users (username, password) VALUES (?, ?)").run(username, hashedPassword);
-
-    return SqliteHelper.db.prepare("SELECT * FROM users WHERE id = ?").get(result.lastInsertRowid) as User;
+    const result = this.AddOne({ username, password: hashedPassword });
+    return result;
   }
 
   // 验证密码
   verifyPassword(password: string, hashedPassword: string): boolean {
     return bcrypt.compareSync(password, hashedPassword);
+  }
+
+  override AfterChange() {}
+
+  override fixEntityIn(_entity: User): void {}
+
+  override fixEntityOut(_entity: User): void {}
+
+  override BeforeAdd(_entity: User): void {
+    _entity.created_at = Math.floor(Date.now() / 1000);
   }
 }

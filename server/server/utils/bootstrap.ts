@@ -13,7 +13,7 @@ class AppBootstrap {
       // 初始化数据库连接
       SqliteHelper.init();
       // 初始化所有模型
-      modelManager.init();
+      g_modelManager.init();
       this.isInitialized = true;
       Logger.info("Application initialized successfully");
     } catch (error) {

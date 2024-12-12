@@ -15,5 +15,6 @@ class ModelManager {
     });
   }
 }
-export const modelManager = new ModelManager();
-modelManager.registerModel(new UserModel());
+export const g_modelManager = new ModelManager();
+export const g_userModel = new UserModel();
+g_modelManager.registerModel(g_userModel);

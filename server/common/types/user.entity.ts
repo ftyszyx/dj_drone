@@ -10,18 +10,17 @@ export class User extends BaseEntity {
   password: string = "";
 
   @Column({ type: "INTEGER", default: 0 })
+  @APIProperty()
   created_at: number = 0;
 }
 
 // 登录请求DTO
-export interface UserLoginDto {
+export interface UserLoginReq {
   username: string;
   password: string;
 }
 
-// 用户响应DTO（不包含密码）
-export interface UserResponseDto {
-  id: number;
-  username: string;
-  created_at: Date;
+export interface UserLoginRes {
+  token: string;
+  user: User;
 }

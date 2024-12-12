@@ -5,5 +5,16 @@ export class BaseEntity {
 }
 
 export enum EntityType {
-  user = "user",
+  User = "user",
+}
+
+export type SearchField<T> = {
+  [P in keyof T]?: any;
+};
+
+export interface WhereDef<T> {
+  cond: SearchField<T>;
+  andor?: "AND" | "OR";
+  page?: number;
+  page_size?: number;
 }

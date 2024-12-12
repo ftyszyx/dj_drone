@@ -1,40 +1,36 @@
-import { UserModel } from "../../models/UserModel";
-import { generateToken } from "../../utils/jwt";
 import { H3Event } from "h3";
-import { UserLoginDto, UserResponseDto } from "../../../common/types/user.entity";
-import { Logger } from "../../utils/logger";
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const { username, password } = await readBody<UserLoginDto>(event);
+    const { username, password } = await readBody<UserLoginReq>(event);
 
     // 参数验证
     if (!username || !password) {
       Logger.warn("Login attempt with missing credentials");
       return createError({
-        statusCode: 400,
+        statusCode: ApiStatus.FORM_ERROR,
         message: "Username and password are required",
       });
     }
 
     // 查询用户
-    const user = UserModel.findByUsername(username);
+    const user = g_userModel.findByUsername(username);
 
     // 用户不存在
     if (!user) {
       Logger.warn(`Login attempt with non-existent username: ${username}`);
       return createError({
-        statusCode: 401,
+        statusCode: ApiStatus.USER_NOT_FOUND,
         message: "Invalid username or password",
       });
     }
 
     // 验证密码
-    const isValidPassword = UserModel.verifyPassword(password, user.password);
+    const isValidPassword = g_userModel.verifyPassword(password, user.password);
     if (!isValidPassword) {
       Logger.warn(`Failed login attempt for user: ${username}`);
       return createError({
-        statusCode: 401,
+        statusCode: ApiStatus.USER_PASSWORD_ERROR,
         message: "Invalid username or password",
       });
     }
@@ -44,29 +40,20 @@ export default defineEventHandler(async (event: H3Event) => {
     // 生成 token
     const token = generateToken(user.id);
 
-    // 设置 cookie
-    setCookie(event, "auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
-
+    user.password = undefined;
     // 返回用户信息（不包含密码）
-    const userResponse: UserResponseDto = {
-      id: user.id,
-      username: user.username,
-      created_at: user.created_at,
+    const userResponse: UserLoginRes = {
+      token: token,
+      user: user,
     };
-
     return {
       success: true,
-      user: userResponse,
+      data: userResponse,
     };
   } catch (error) {
     Logger.error("Login error:", error);
     return createError({
-      statusCode: 500,
+      statusCode: ApiStatus.ERROR,
       message: "Internal server error",
     });
   }
