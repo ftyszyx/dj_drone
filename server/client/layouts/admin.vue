@@ -20,8 +20,8 @@
           <h2 class="text-lg font-medium">{{ currentPage }}</h2>
         </div>
         <div class="flex items-center space-x-4">
-          <select v-model="$i18n.locale" class="border rounded px-2 py-1">
-            <option v-for="locale in $i18n.locales" :key="locale.code" :value="locale.code">
+          <select v-model="locale" class="border rounded px-2 py-1" @change="switchLanguage">
+            <option v-for="locale in locales" :key="locale.code" :value="locale.code">
               {{ locale.name }}
             </option>
           </select>
@@ -39,13 +39,18 @@
   </div>
 </template>
 
-<script setup>
-const { $i18n } = useNuxtApp();
+<script setup lang="ts">
+const { t, locale, locales } = useI18n();
+
+const switchLanguage = (event: Event) => {
+  const target = event.target as HTMLSelectElement;
+  locale.value = target.value as "en" | "zh";
+};
 
 const menuItems = [
-  { path: "/admin/dashboard", title: $t("menu.dashboard") },
-  { path: "/admin/users", title: $t("menu.users") },
-  { path: "/admin/settings", title: $t("menu.settings") },
+  { path: "/admin/dashboard", title: t("menu.dashboard") },
+  { path: "/admin/users", title: t("menu.users") },
+  { path: "/admin/settings", title: t("menu.settings") },
 ];
 
 const route = useRoute();
@@ -55,6 +60,7 @@ const currentPage = computed(() => {
 
 const handleLogout = async () => {
   try {
+    useCookie("token").value = "";
     await $fetch("/api/auth/logout", { method: "POST" });
     await navigateTo("/login");
   } catch (error) {
