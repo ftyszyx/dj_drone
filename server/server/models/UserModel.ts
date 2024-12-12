@@ -13,8 +13,9 @@ export class UserModel extends BaseModel<User> {
   // 创建默认管理员账户
   private createDefaultAdmin() {
     const admin = this.findByUsername("admin");
+    const runtimeConfig = useRuntimeConfig();
     if (!admin) {
-      const hashedPassword = bcrypt.hashSync(process.env.ADMIN_INIT_PASSWORD, 10);
+      const hashedPassword = bcrypt.hashSync(runtimeConfig.adminInitPassword, 10);
       this.AddOne({ username: "admin", password: hashedPassword });
     }
   }

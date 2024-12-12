@@ -4,7 +4,11 @@ import path from "path";
 
 class SqliteHelperClass {
   private _db: Database.Database;
-  constructor() {}
+  private showSqlLog: boolean = false;
+  constructor() {
+    const runtimeConfig = useRuntimeConfig();
+    this.showSqlLog = runtimeConfig.sqlLog;
+  }
   get db() {
     if (!this._db) {
       throw new Error("Database connection not initialized");
@@ -31,14 +35,14 @@ class SqliteHelperClass {
   }
 
   private _runSql(sql: string) {
-    if (process.env.SQL_LOG == "true") {
+    if (this.showSqlLog) {
       Logger.info("Executing SQL:", sql);
     }
     return this._db.exec(sql);
   }
 
   private _runSqlALL2(sql: string): any[] {
-    if (process.env.SQL_LOG == "true") {
+    if (this.showSqlLog) {
       Logger.info("Executing SQL:", sql);
     }
     const res = this._db.prepare(sql).all();
@@ -46,26 +50,28 @@ class SqliteHelperClass {
   }
 
   private _runsqlGet2(sql: string): any {
-    if (process.env.SQL_LOG == "true") {
+    if (this.showSqlLog) {
       Logger.info("Executing SQL:", sql);
     }
     const res = this._db.prepare(sql).get();
     return res as any;
   }
 
-  private _runSqlGet<T extends BaseEntity>(obj: BaseEntity, sql: string): T {
-    if (process.env.SQL_LOG == "true") {
+  private _runSqlGet<T extends BaseEntity>(obj: BaseEntity, sql: string): T | null {
+    if (this.showSqlLog) {
       Logger.info("Executing SQL:", sql);
     }
     const res = this._db.prepare(sql).get();
+    if (!res) return null;
     return this.SqlRes2Entity(obj, [res])[0] as T;
   }
 
   private _runSqlAll<T extends BaseEntity>(obj: BaseEntity, sql: string): T[] {
-    if (process.env.SQL_LOG == "true") {
+    if (this.showSqlLog) {
       Logger.info("Executing SQL:", sql);
     }
     const res = this._db.prepare(sql).all();
+    if (!res) return [];
     return this.SqlRes2Entity(obj, res);
   }
 

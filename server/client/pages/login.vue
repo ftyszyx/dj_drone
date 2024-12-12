@@ -43,12 +43,7 @@
 
           <!-- 记住我和忘记密码 -->
           <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input type="checkbox" v-model="form.remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-              <label class="ml-2 block text-sm text-gray-900">
-                {{ $t("login.rememberMe") }}
-              </label>
-            </div>
+            <div class="flex items-center"></div>
             <div class="text-sm">
               <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
                 {{ $t("login.forgotPassword") }}
@@ -110,9 +105,7 @@ const handleLogin = async () => {
       const authToken = useCookie("auth_token", {
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
-      if (form.remember) {
-        authToken.value = response.data.token;
-      }
+      authToken.value = response.data.token;
       await navigateTo("/admin/dashboard");
     }
   } catch (err) {

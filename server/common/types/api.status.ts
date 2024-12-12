@@ -6,4 +6,5 @@ export enum ApiStatus {
   USER_PASSWORD_ERROR = 402,
   ENTITY_NOT_FOUND = 403,
   ENTITY_UPDATE_ERROR = 404,
+  NOT_LOGIN = 405,
 }

@@ -12,7 +12,9 @@ export interface TokenPayload {
 }
 
 export function generateToken(userId: number): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRE });
+  const runtimeConfig = useRuntimeConfig();
+  const expiresIn = runtimeConfig.tokenExpire || "3d";
+  return jwt.sign({ userId }, runtimeConfig.jwtSecret, { expiresIn });
 }
 
 export function verifyToken(token: string): TokenPayload | null {

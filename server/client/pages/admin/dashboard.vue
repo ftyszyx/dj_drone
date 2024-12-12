@@ -9,6 +9,7 @@
 
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-lg font-medium mb-4">{{ $t("dashboard.recentActivity") }}</h2>
+      test
       <!-- 这里可以放置图表或数据表格 -->
     </div>
   </div>
@@ -18,10 +19,4 @@
 definePageMeta({
   layout: "admin",
 });
-
-const stats = [
-  { title: $t("dashboard.totalUsers"), value: "1,234" },
-  { title: $t("dashboard.activeUsers"), value: "891" },
-  { title: $t("dashboard.totalRevenue"), value: "¥12,345" },
-];
 </script>

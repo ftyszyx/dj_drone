@@ -3,6 +3,13 @@ import { defineNuxtConfig } from "nuxt/config";
 import type { Nitro } from "nitropack";
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    jwtSecret: "ddsdfa",
+    adminInitPassword: "admin123",
+    sqlLog: true,
+    tokenExpire: "3d",
+    public: {},
+  },
   compatibilityDate: "2024-11-01",
   srcDir: "client",
   imports: {
