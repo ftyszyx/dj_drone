@@ -83,7 +83,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const form = reactive({
   username: "",
   password: "",
@@ -97,13 +97,13 @@ const handleLogin = async () => {
     loading.value = true;
     error.value = false;
 
-    const response = await $fetch("/api/auth/login", {
+    const response = await $fetch<ApiResp<UserLoginRes>>("/api/auth/login", {
       method: "POST",
       body: {
         username: form.username,
         password: form.password,
       },
-    }) as ApiResp<UserLoginRes>;
+    });
 
     if (response.success) {
       // 如果选择了记住我，设置更长的 cookie 过期时间
