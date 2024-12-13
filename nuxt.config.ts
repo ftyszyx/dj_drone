@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
-  serverMiddleware: [{ path: "/socket", handler: "~/server/socket" }],
+  // 设置源代码目录
+  srcDir: "server",
+
+  serverMiddleware: [{ path: "/socket", handler: "~/socket" }],
 
   // 添加 protobufjs 到构建配置
   build: {

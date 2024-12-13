@@ -88,6 +88,10 @@ export default async function () {
       case MessageType.values.ANOMALY_REPORT:
         handleAnomalyReport(message.anomaly);
         break;
+
+      case MessageType.values.VIDEO_STREAM:
+        handleVideoFrame(message.videoFrame);
+        break;
     }
 
     // 广播消息给所有连接的 Web 客户端
@@ -117,5 +121,21 @@ export default async function () {
   function handleAnomalyReport(anomaly: any) {
     console.log("Received anomaly report:", anomaly);
     io.emit("anomaly-report", anomaly);
+  }
+
+  // 处理视频帧
+  function handleVideoFrame(frame: any) {
+    // 将视频帧转换为可在浏览器中显示的格式
+    const frameData = {
+      timestamp: frame.timestamp,
+      data: Buffer.from(frame.data).toString("base64"),
+      format: frame.format,
+      width: frame.width,
+      height: frame.height,
+      frameIndex: frame.frameIndex,
+    };
+
+    // 广播视频帧给所有连接的客户端
+    io.emit("video-frame", frameData);
   }
 }
