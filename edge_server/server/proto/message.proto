@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package edge.proto;
+
+// 消息类型枚举
+enum MessageType {
+    UNKNOWN = 0;
+    HEARTBEAT = 1;           // 心跳
+    AUTH = 2;                // 认证
+    DRONE_STATUS = 3;        // 无人机状态
+    IMAGE_DATA = 4;          // 图像数据
+    VIDEO_STREAM = 5;        // 视频流
+    ANOMALY_REPORT = 6;      // 异常报告
+    COMMAND = 7;             // 控制命令
+}
+
+// 心跳消息
+message Heartbeat {
+    int64 timestamp = 1;
+}
+
+// 认证消息
+message Auth {
+    string device_id = 1;
+    string token = 2;
+}
+
+// 无人机状态
+message DroneStatus {
+    float battery_percent = 1;
+    float latitude = 2;
+    float longitude = 3;
+    float altitude = 4;
+    float velocity_x = 5;
+    float velocity_y = 6;
+    float velocity_z = 7;
+    string flight_mode = 8;
+    bool is_flying = 9;
+}
+
+// 图像数据
+message ImageData {
+    int64 timestamp = 1;
+    bytes image = 2;
+    string format = 3;  // "jpg", "png" etc.
+}
+
+// 视频流配置
+message VideoStreamConfig {
+    int32 width = 1;
+    int32 height = 2;
+    int32 fps = 3;
+    string codec = 4;  // "h264", "h265" etc.
+}
+
+// 异常报告
+message AnomalyReport {
+    int64 timestamp = 1;
+    string type = 2;
+    float confidence = 3;
+    ImageData image = 4;
+    string description = 5;
+}
+
+// 控制命令
+message Command {
+    enum CommandType {
+        UNKNOWN_CMD = 0;
+        START_STREAM = 1;    // 开始视频流
+        STOP_STREAM = 2;     // 停止视频流
+        TAKE_PHOTO = 3;      // 拍照
+        SET_CONFIG = 4;      // 设置配置
+    }
+    CommandType type = 1;
+    VideoStreamConfig stream_config = 2;
+    string params = 3;       // 其他参数（JSON格式）
+}
+
+// 包装消息
+message Message {
+    MessageType type = 1;
+    int64 sequence = 2;      // 消息序号
+    int64 timestamp = 3;
+    
+    oneof payload {
+        Heartbeat heartbeat = 4;
+        Auth auth = 5;
+        DroneStatus drone_status = 6;
+        ImageData image_data = 7;
+        VideoStreamConfig video_config = 8;
+        AnomalyReport anomaly = 9;
+        Command command = 10;
+    }
+} 

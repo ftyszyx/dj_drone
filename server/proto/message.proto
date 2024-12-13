@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package edge.proto;
+
+// 消息类型枚举
+enum MessageType {
+    UNKNOWN = 0;
+    HEARTBEAT = 1;           // 心跳
+    AUTH = 2;                // 认证
+    DRONE_STATUS = 3;        // 无人机状态
+    IMAGE_DATA = 4;          // 图像数据
+    VIDEO_STREAM = 5;        // 视频流
+    ANOMALY_REPORT = 6;      // 异常报告
+    COMMAND = 7;             // 控制命令
+}
+
+// ... (其他消息定义与 C++ 端相同) 
