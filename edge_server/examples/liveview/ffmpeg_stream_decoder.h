@@ -31,6 +31,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
 
@@ -51,7 +52,7 @@ class FFmpegStreamDecoder : public StreamDecoder {
    private:
     std::mutex decode_mutex;
     AVCodecContext *pCodecCtx = nullptr;
-    AVCodec *pCodec = nullptr;
+    const AVCodec *pCodec = nullptr;
     AVCodecParserContext *pCodecParserCtx = nullptr;
     SwsContext *pSwsCtx = nullptr;
 

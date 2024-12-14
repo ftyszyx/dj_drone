@@ -36,7 +36,7 @@ FFmpegStreamDecoder::FFmpegStreamDecoder(const std::string &name)
 FFmpegStreamDecoder::~FFmpegStreamDecoder() {}
 
 int32_t FFmpegStreamDecoder::Init() {
-    avcodec_register_all();
+    // avcodec_register_all();
 
     pCodec = avcodec_find_decoder(AV_CODEC_ID_H264);
     if (!pCodec) {
@@ -141,11 +141,21 @@ int32_t FFmpegStreamDecoder::Decode(const uint8_t *data, size_t length,
 
         if (pkt.size > 0) {
             int gotPicture = 0;
-            avcodec_decode_video2(pCodecCtx, pFrameYUV, &gotPicture, &pkt);
-
-            if (!gotPicture) {
-                continue;
-            } else {
+            int ret=avcodec_send_packet(pCodecCtx, &pkt);
+            if(ret<0)
+            {
+                ERROR("avcodec_send_packet failed: %d", ret);
+                return ret;
+            }
+            while (ret>=0)
+            {
+            ret=avcodec_receive_frame(pCodecCtx, pFrameYUV);
+             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                    break;
+                } else if (ret < 0) {
+                    ERROR("Error during decoding");
+                    return ret;
+                }
                 if (pFrameYUV->width != decode_width ||
                     pFrameYUV->height != decode_hight) {
                     decode_width = pFrameYUV->width;
@@ -171,10 +181,10 @@ int32_t FFmpegStreamDecoder::Decode(const uint8_t *data, size_t length,
                 }
 
                 if (nullptr == rgbBuf) {
-                    bufSize = avpicture_get_size(AV_PIX_FMT_RGB24, w, h);
+                     bufSize = av_image_get_buffer_size(AV_PIX_FMT_RGB24, w, h, 1);
                     rgbBuf = (uint8_t *)av_malloc(bufSize);
-                    avpicture_fill((AVPicture *)pFrameRGB, rgbBuf,
-                                   AV_PIX_FMT_RGB24, w, h);
+                      av_image_fill_arrays(pFrameRGB->data, pFrameRGB->linesize, rgbBuf,
+                                         AV_PIX_FMT_RGB24, w, h, 1);
                 }
 
                 if (nullptr != pSwsCtx && nullptr != rgbBuf) {
@@ -195,7 +205,7 @@ int32_t FFmpegStreamDecoder::Decode(const uint8_t *data, size_t length,
                 }
             }
         }
-        av_free_packet(&pkt);
+        av_packet_unref(&pkt);
     }
     return 0;
 }
